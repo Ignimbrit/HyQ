@@ -5,6 +5,7 @@ import numpy as np
 import HyQ.wells
 from HyQ.wells import well
 from HyQ.theis import theis_drawdown
+from HyQ.model_backend import calculate_well_dist_mat
 
 class GWModel:
     def __init__(self):
@@ -40,16 +41,12 @@ class GWModel:
 
     def __calculate_well_dist_mat(self):
         for well in self.wells:
-            welldistmat = np.zeros(shape=self.grid["dist"].shape)
-
-            with np.nditer(welldistmat, flags=['multi_index'], op_flags=['readwrite']) as it:
-                for cell in it:
-                    i, j = it.multi_index
-                    x = j * self.grid["res_x"]
-                    y = i * self.grid["res_y"]
-                    cell[...] = math.dist([well.x, well.y],[x, y])
-
-            well.distmat = welldistmat
+            well.distmat = calculate_well_dist_mat(
+                well = well,
+                shape = self.grid["dist"].shape,
+                res_x = self.grid["res_x"],
+                res_y = self.grid["res_y"]
+            )
 
     def add_wells(self, *args):
         for arg in args:
