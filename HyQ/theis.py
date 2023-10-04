@@ -23,3 +23,6 @@ def theis_drawdown(Q: float, T: float, r: float, S: float, t: float, n: int = 30
     W_von_u = theis_wellfunction(u = u, n = n)
 
     return (Q/(4*math.pi*T))*W_von_u
+
+def jakob_freegw_mod(s: float, H: float) -> float:
+    return s - ((s**2)/(2*H))

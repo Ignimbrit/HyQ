@@ -38,7 +38,7 @@ class GWModel:
         self.aquifer["M"] = M
         self.aquifer["confined"] = confined
 
-    def __calculate_well_dist_mar(self):
+    def __calculate_well_dist_mat(self):
         for well in self.wells:
             welldistmat = np.zeros(shape=self.grid["dist"].shape)
 
@@ -55,7 +55,7 @@ class GWModel:
         for arg in args:
             if isinstance(arg, HyQ.wells.well):
                 self.wells.append(arg)
-        self.__calculate_well_dist_mar()
+        self.__calculate_well_dist_mat()
 
     def set_timesteps(self, tlist):
         self.timesteps = tlist
