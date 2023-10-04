@@ -4,8 +4,8 @@ import numpy as np
 
 import HyQ.wells
 from HyQ.wells import well
-from HyQ.theis import theis_drawdown
-from HyQ.model_backend import calculate_well_dist_mat
+from HyQ.theis import theis_drawdown, jakob_freegw_mod
+from HyQ.model_backend import calculate_well_dist_mat, calculate_well_drawdown
 
 class GWModel:
     def __init__(self):
@@ -58,21 +58,14 @@ class GWModel:
         self.timesteps = tlist
 
     def run(self):
+        H0 = self.grid["H0"]
         for t in self.timesteps:
-            H = self.grid["H0"]
+            H = H0
             for well in self.wells:
-                s = np.zeros(shape=self.grid["dist"].shape)
-                with np.nditer(s, flags=['multi_index'], op_flags=['readwrite']) as it:
-                    for cell in it:
-                        i, j = it.multi_index
-                        cell[...] = theis_drawdown(
-                            Q = well.Q,
-                            T= self.aquifer["T"],
-                            r = well.distmat[i,j],
-                            S = self.aquifer["S"],
-                            t = t
-                        )
-                well.drawdown = s
-                H = H - s
+                sgrid = calculate_well_drawdown(
+                    H0 = H0, t = t, well = well, aquiferparams = self.aquifer
+                )
+                well.drawdown = sgrid
+                H = H - sgrid
             self.H.append(H)
 
