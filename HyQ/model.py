@@ -1,10 +1,16 @@
 import math
 from pathlib import Path
+import os
+import tempfile
 
 import numpy as np
 import matplotlib.pyplot as plt
 import rasterio
 from rasterio.plot import show
+
+from osgeo import osr
+from osgeo import ogr
+from osgeo import gdal
 
 import HyQ.wells
 from HyQ.wells import well
@@ -101,3 +107,44 @@ class GWModel:
                 count = len(self.H), dtype = self.H[0].dtype, transform = self.grid["affine"]) as dest:
             for i, H in enumerate(self.H):
                 dest.write(H, i+1)
+
+    def export_contours_head(self, gpkgpath, levels):
+        fd, path = tempfile.mkstemp(suffix=".tiff")
+
+        try:
+            self.export_head(path)
+
+            contourDs = ogr.GetDriverByName("GPKG").CreateDataSource(gpkgpath)
+
+            for i, H in enumerate(self.H):
+                # Open tif file as select band
+                rasterDs = gdal.Open(path)
+                rasterBand = rasterDs.GetRasterBand(i+1)
+                proj = osr.SpatialReference(wkt=rasterDs.GetProjection())
+
+                # Get elevation as numpy array
+                elevArray = rasterBand.ReadAsArray()
+
+                # define not a number
+                demNan = -9999
+
+                # get dem max and min
+                demMax = elevArray.max()
+                demMin = elevArray[elevArray != demNan].min()
+
+                # define layer name and spatial
+                contourShp = contourDs.CreateLayer(f"cntr_{i+1}", proj)
+
+                # define fields of id and elev
+                fieldDef = ogr.FieldDefn("ID", ogr.OFTInteger)
+                contourShp.CreateField(fieldDef)
+                fieldDef = ogr.FieldDefn("elev", ogr.OFTReal)
+                contourShp.CreateField(fieldDef)
+
+                conList = levels
+
+                gdal.ContourGenerate(rasterBand, 0, 0, conList, 1, demNan, contourShp, 0, 1)
+
+        finally:
+            contourDs.Destroy()
+            os.remove(path)
