@@ -1,4 +1,5 @@
 import math
+from pathlib import Path
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,7 +19,9 @@ class GWModel:
         self.timesteps = []
         self.H = []
 
-    def set_grid(self, x_min, y_max, len_x, len_y, res_x, res_y):
+    def set_grid(self, x_min, y_max, len_x, len_y, res_x, res_y, crs = None):
+        self.grid["crs"] = crs
+
         self.grid["description"], self.grid["arrayshape"], self.grid["affine"] = raster_from_scratch(
             x_min=x_min, y_max=y_max, len_x=len_x, len_y=len_y, res_x=res_x, res_y=res_y
         )
@@ -91,3 +94,10 @@ class GWModel:
             )
         plt.show()
 
+    def export_head(self, fp):
+        with rasterio.open(
+                fp, "w", driver = 'GTiff',
+                height = self.grid["arrayshape"][0], width = self.grid["arrayshape"][1], crs = self.grid["crs"],
+                count = len(self.H), dtype = self.H[0].dtype, transform = self.grid["affine"]) as dest:
+            for i, H in enumerate(self.H):
+                dest.write(H, i+1)
