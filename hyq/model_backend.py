@@ -3,8 +3,8 @@ import math
 import numpy as np
 import rasterio
 
-import HyQ.wells
-from HyQ.theis import theis_drawdown, jakob_freegw_mod
+import hyq.wells
+from hyq.theis import theis_drawdown, jakob_freegw_mod
 
 def raster_from_scratch(x_min: float, y_max: float, len_x: float, len_y: float, res_x: float, res_y: float):
     new_griddescription = {
@@ -23,7 +23,7 @@ def raster_from_scratch(x_min: float, y_max: float, len_x: float, len_y: float, 
     return (new_griddescription, new_arrayshape, new_transform)
 
 def calculate_well_dist_mat(
-        well: HyQ.wells.well, shape: tuple, res_x: float, res_y: float, x_min: float, y_max: float) -> np.array:
+        well: hyq.wells.well, shape: tuple, res_x: float, res_y: float, x_min: float, y_max: float) -> np.array:
 
     welldistmat = np.zeros(shape=shape)
 
@@ -36,7 +36,7 @@ def calculate_well_dist_mat(
 
     return welldistmat
 
-def calculate_well_drawdown(H0: np.array, t: int, well: HyQ.wells.well, aquiferparams: dict) -> np.array:
+def calculate_well_drawdown(H0: np.array, t: int, well: hyq.wells.well, aquiferparams: dict) -> np.array:
     sgrid = np.zeros(shape=H0.shape)
     with np.nditer(sgrid, flags=['multi_index'], op_flags=['readwrite']) as it:
         for cell in it:

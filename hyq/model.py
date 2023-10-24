@@ -12,10 +12,10 @@ from osgeo import osr
 from osgeo import ogr
 from osgeo import gdal
 
-import HyQ.wells
-from HyQ.wells import well
-from HyQ.theis import theis_drawdown, jakob_freegw_mod
-from HyQ.model_backend import calculate_well_dist_mat, calculate_well_drawdown, raster_from_scratch
+import hyq.wells
+from hyq.wells import well
+from hyq.theis import theis_drawdown, jakob_freegw_mod
+from hyq.model_backend import calculate_well_dist_mat, calculate_well_drawdown, raster_from_scratch
 
 class GWModel:
     def __init__(self):
@@ -67,7 +67,7 @@ class GWModel:
 
     def add_wells(self, *args):
         for arg in args:
-            if isinstance(arg, HyQ.wells.well):
+            if isinstance(arg, hyq.wells.well):
                 self.wells.append(arg)
         self.__calculate_well_dist_mat()
 
