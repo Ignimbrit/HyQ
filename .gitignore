@@ -3,3 +3,5 @@ venv/
 docs/tutorials/
 hyq/__pycache__/
 hyq.egg-info/
+*.gpkg-*
+*checkpoint.ipynb

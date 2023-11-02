@@ -13,7 +13,7 @@ on the aquifers head: well by well, gridcell by gridcell, and for each point in 
 
 - [Installation](#Installation)
 - [Disclaimer](#Disclaimer)
-- [Raison d'Être](#Raison-d'Être)
+- [Raison d'Être](#raison-dêtre)
 - [Features](#Features)
 - [Example](#Example)
 
